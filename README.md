@@ -124,7 +124,7 @@ With a simple switch ( other languages in the future versions )
 
 ## 🙏 Acknowledgement
 
-A special thank‑you to **[SimonLariz]**, creator of **ChessToFEN**.  
+A special thank‑you to **SimonLariz**, creator of **ChessToFEN**.  
 Your elegant board‑recognition project laid the foundation for ChessMate’s OCR pipeline and continues to inspire open‑source chess enthusiasts everywhere. ♟️
 
 ---
