@@ -1,4 +1,4 @@
-# ChessMate – your friendly on‑screen chess assistant ♟️
+# ChessMate – Your AI friend on every move ♟️
 
 <p align="center">
   <img src="assets/chessmate.png" alt="ChessMate logo" width="240"/>
