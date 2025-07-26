@@ -1,0 +1,35 @@
+###########################################################
+#  GUI – Qt / Material
+###########################################################
+PySide6~=6.7.0          # bindings Qt6 (Widgets, QtCore…)
+qt-material~=2.14.0     # thème Material pour PySide6
+
+###########################################################
+#  Vision & Deep‑Learning
+###########################################################
+torch>=2.2              # (choisis +cu121 / +cpu selon ta machine)
+torchvision>=0.17       # transforms, modèles pré‑entraînés
+Pillow~=10.3            # PIL – lecture/écriture PNG etc.
+opencv-python-headless~=4.10  # OpenCV sans GUI (plus léger)
+mss~=9.0.1              # capture d’écran ultra‑rapide
+
+###########################################################
+#  Chess & moteur
+###########################################################
+python-chess~=1.999     # FEN / SAN / interface Stockfish
+
+###########################################################
+#  CLI / utilitaires
+###########################################################
+click~=8.1              # menus en ligne de commande (module legacy)
+colorama~=0.4           # couleurs ANSI (Windows OK)
+requests~=2.32          # appels HTTP vers LLM
+pyautogui~=0.9          # (optionnel) capture clavier‑souris
+
+###########################################################
+#  TIPS
+#  • Sur GPU NVIDIA : installe la variante torch‑*+cuXX
+#      ex : pip install torch==2.2.0+cu118  torchvision==0.17.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html
+#  • Stockfish n’est PAS une dépendance pip : place l’exécutable
+#    dans  engines/stockfish‑windows‑x86‑64.exe  à télécharger de https://stockfishchess.org/download
+###########################################################
