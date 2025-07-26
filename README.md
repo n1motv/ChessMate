@@ -82,6 +82,15 @@ Repeat once per screen resolution or if you move/resize the board.
 ```bash
 python main.py
 ```
+<p align="center">
+  <img src="assets/exemple1.png" alt="exemple1 logo" width="240"/>
+</p>
+<p align="center">
+  <img src="assets/exemple2.png" alt="exemple2 logo" width="240"/>
+</p>
+<p align="center">
+  <img src="assets/exemple3.png" alt="exemple3 logo" width="240"/>
+</p>
 
 1. Choose **“I play White / Black”**.  
 2. Press **▶ Launch analysis**.  
