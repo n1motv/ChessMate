@@ -68,7 +68,7 @@ SIZE = 1088  # board is square → SIZE × SIZE
 5. Change your board on the game to this theme: 
 
 <p align="center">
-  <img src="assets/theme.png" alt="Theme logo" width="240"/>
+  <img src="assets/theme.png" alt="Theme logo"/>
 </p>
 
 6. Save & run `python -m vision` to verify the 64 cropped squares look correct.
@@ -83,13 +83,13 @@ Repeat once per screen resolution or if you move/resize the board.
 python main.py
 ```
 <p align="center">
-  <img src="assets/exemple1.png" alt="exemple1 logo" width="240"/>
+  <img src="assets/exemple1.png" alt="exemple1 logo"/>
 </p>
 <p align="center">
-  <img src="assets/exemple2.png" alt="exemple2 logo" width="240"/>
+  <img src="assets/exemple2.png" alt="exemple2 logo"/>
 </p>
 <p align="center">
-  <img src="assets/exemple3.png" alt="exemple3 logo" width="240"/>
+  <img src="assets/exemple3.png" alt="exemple3 logo"/>
 </p>
 
 1. Choose **“I play White / Black”**.  
