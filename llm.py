@@ -1,7 +1,7 @@
 # llm.py  ──────────────────────────────────────────────────────────────
 import os, json, requests, textwrap, chess
 from engine import BestMoveEngine
-from utils  import ensure_san          # même fonction qu’avant
+from utils  import ensure_san          
 
 API_BASE = os.getenv("LM_ENDPOINT", "http://localhost:1234/v1")
 API_KEY  = os.getenv("LM_API_KEY", "lm-studio")
