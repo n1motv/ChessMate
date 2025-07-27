@@ -1,4 +1,4 @@
-# utils.py  (exemple)
+# utils.py-------------------------------------
 import chess
 
 _NAMES_FR = {
