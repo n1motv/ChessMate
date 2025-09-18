@@ -1,4 +1,4 @@
-# ChessMate – Your AI friend on every move ♟️
+# ChessMate – your friendly on‑screen chess assistant ♟️
 
 <p align="center">
   <img src="assets/chessmate.png" alt="ChessMate logo" width="240"/>
@@ -68,7 +68,7 @@ SIZE = 1088  # board is square → SIZE × SIZE
 5. Change your board on the game to this theme: 
 
 <p align="center">
-  <img src="assets/theme.png" alt="Theme logo"/>
+  <img src="assets/theme.png" alt="Theme logo" width="240"/>
 </p>
 
 6. Save & run `python -m vision` to verify the 64 cropped squares look correct.
@@ -82,15 +82,6 @@ Repeat once per screen resolution or if you move/resize the board.
 ```bash
 python main.py
 ```
-<p align="center">
-  <img src="assets/exemple1.png" alt="exemple1 logo"/>
-</p>
-<p align="center">
-  <img src="assets/exemple2.png" alt="exemple2 logo"/>
-</p>
-<p align="center">
-  <img src="assets/exemple3.png" alt="exemple3 logo"/>
-</p>
 
 1. Choose **“I play White / Black”**.  
 2. Press **▶ Launch analysis**.  
@@ -119,13 +110,6 @@ With a simple switch ( other languages in the future versions )
 | “`stockfish not found`” | Put the binary in `engines/` or set `STOCKFISH_PATH`. |
 | “`san() expect move legal…`” | The LLM produced an invalid move. ChessMate automatically falls back to Stockfish and skips the explanation. |
 | Incorrect FEN | Re‑check board coordinates and lighting; retrain `resnet18_chess.pt` if using a very different theme. |
-
----
-
-## 🙏 Acknowledgement
-
-A special thank‑you to **SimonLariz**, creator of **ChessToFEN**.  
-Your elegant board‑recognition project laid the foundation for ChessMate’s OCR pipeline and continues to inspire open‑source chess enthusiasts everywhere. ♟️
 
 ---
 

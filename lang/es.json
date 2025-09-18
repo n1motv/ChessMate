@@ -1,0 +1,13 @@
+{
+  "white": "Juego con blancas",
+  "black": "Juego con negras",
+  "start": "⏵ INICIAR ANÁLISIS",
+  "stop": "⏹ DETENER",
+  "waiting": "Analizando…",
+  "bestMove": "Mejor jugada",
+  "bestPath": "Mejor camino",
+  "eval": "Eval",
+  "error": "Error",
+  "mode_auto": "Jugada automática",
+  "mode_manual": "Solo resaltar"
+}

@@ -1,0 +1,13 @@
+{
+  "white": "I play White",
+  "black": "I play Black",
+  "start": "⏵ START ANALYSIS",
+  "stop": "⏹ STOP",
+  "waiting": "Analysing…",
+  "bestMove": "Best move",
+  "bestPath": "Best path",
+  "eval": "Eval",
+  "error": "Error",
+  "mode_auto": "Auto-play",
+  "mode_manual": "Highlight only"
+}

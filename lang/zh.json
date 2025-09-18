@@ -1,0 +1,13 @@
+{
+  "white": "我执白子",
+  "black": "我执黑子",
+  "start": "⏵ 开始分析",
+  "stop": "⏹ 停止",
+  "waiting": "正在分析…",
+  "bestMove": "最佳走法",
+  "bestPath": "最佳路径",
+  "eval": "评估",
+  "error": "错误",
+  "mode_auto": "自动下棋",
+  "mode_manual": "仅高亮"
+}

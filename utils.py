@@ -1,4 +1,4 @@
-# utils.py-------------------------------------
+# utils.py  (exemple)
 import chess
 
 _NAMES_FR = {
@@ -53,3 +53,4 @@ def ensure_san(fen: str, move_txt: str) -> str:
         raise RuntimeError(f"Coup illégal : {move_txt} dans {fen}")
 
     return board.san(mv)
+

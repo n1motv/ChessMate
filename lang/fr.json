@@ -1,0 +1,13 @@
+{
+  "white": "Je joue les Blancs",
+  "black": "Je joue les Noirs",
+  "start": "⏵ LANCER L'ANALYSE",
+  "stop": "⏹ STOP",
+  "waiting": "Analyse…",
+  "bestMove": "Meilleur coup",
+  "bestPath": "Meilleur chemin",
+  "eval": "Éval",
+  "error": "Erreur",
+  "mode_auto": "Jeu automatique",
+  "mode_manual": "Surlignage uniquement"
+}

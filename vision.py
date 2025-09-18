@@ -1,39 +1,53 @@
-# vision.py  ───────────────────────────────────────────────────────────
-import os, mss
+import os, mss, cv2, numpy as np
 from PIL import Image
-from ChessToFEN import chessClassifier   # assure-toi que le path est correct
+from ChessToFEN import chessClassifier
 
-# Coordonnées adaptées à ton écran 
-LEFT   = 441          # x de la case a8
-TOP    = 237          # y de la case a8
-SIZE   = 1088          # l’échiquier est carré 
-SQUARE = SIZE // 8    
-
-def screenshot_and_slice(output_dir="data", monitor=1):
-    """Capture l'écran et découpe l'échiquier en 64 cases (8 × 8)."""
-    os.makedirs(output_dir, exist_ok=True)
-
+# ────────────────── détection du plateau ────────────────────────────
+def detect_board_region(monitor=1):
     with mss.mss() as sct:
         screen = sct.grab(sct.monitors[monitor])
-        img = Image.frombytes("RGB", screen.size, screen.rgb)
+        img    = cv2.cvtColor(np.array(screen), cv2.COLOR_BGRA2BGR)
 
-    # on isole l’échiquier
-    img = img.crop((LEFT, TOP, LEFT + SIZE, TOP + SIZE))
+    gray  = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur  = cv2.GaussianBlur(gray, (5, 5), 0)
+    edges = cv2.Canny(blur, 50, 150)
 
-    # on découpe en 64 cases
-    for row in range(8):
-        for col in range(8):
-            x0, y0 = col * SQUARE, row * SQUARE
-            x1, y1 = x0 + SQUARE, y0 + SQUARE
-            img.crop((x0, y0, x1, y1)) \
-               .save(os.path.join(output_dir, f"{row*8+col:02}.png"))
+    cnts, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    board   = max(cnts, key=cv2.contourArea)
 
-def screenshot_to_fen(side="w"):            # side = "w" ou "b"
-    screenshot_and_slice("data")            # ← REMIS
-    board = chessClassifier.predict_pieces("data")
-    fen   = chessClassifier.convert_to_fen(board)
+    peri   = cv2.arcLength(board, True)
+    approx = cv2.approxPolyDP(board, 0.02 * peri, True)
+    x, y, w, h = cv2.boundingRect(approx.reshape(-1, 2)) if len(approx) >= 4 \
+                 else cv2.boundingRect(board)
 
-    cast  = "-"      # ou "KQkq" si tu veux
-    ep    = "-"
-    hm,fm = "0","1"
-    return f"{fen} {side} {cast} {ep} {hm} {fm}"
+    return img, x, y, w, h
+
+# ────────────────── capture → FEN ───────────────────────────────────
+def screenshot_and_slice(out_dir="data", monitor=1):
+    os.makedirs(out_dir, exist_ok=True)
+    img, x, y, w, h = detect_board_region(monitor)
+    board = img[y:y+h, x:x+w]
+    board = Image.fromarray(cv2.cvtColor(board, cv2.COLOR_BGR2RGB))
+
+    sq = w // 8
+    for r in range(8):
+        for c in range(8):
+            x0, y0 = c*sq, r*sq
+            board.crop((x0, y0, x0+sq, y0+sq)).save(f"{out_dir}/{r*8+c:02}.png")
+
+def screenshot_to_fen(side="w", monitor=1):
+    screenshot_and_slice("data", monitor)
+    matrix = chessClassifier.predict_pieces("data")
+    fen    = chessClassifier.convert_to_fen(matrix)
+    return f"{fen} {side} - - 0 1"
+
+# ────────────────── coordonnées pixels ──────────────────────────────
+_img, LEFT, TOP, W, H = detect_board_region()
+SQUARE = W // 8
+
+def square_to_xy(square:str) -> tuple[int,int]:
+    col = ord(square[0]) - ord('a')          # a→0 … h→7
+    row = 8 - int(square[1])                 # rang 8 (haut) → 0
+    x = LEFT + col*SQUARE + SQUARE//2
+    y = TOP  + row*SQUARE + SQUARE//2
+    return x, y
