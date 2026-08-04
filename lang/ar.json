@@ -9,5 +9,41 @@
   "eval": "تقييم",
   "error": "خطأ",
   "mode_auto": "تشغيل تلقائي",
-  "mode_manual": "تسليط الضوء فقط"
+  "mode_manual": "تسليط الضوء فقط",
+
+  "app_title": "ChessMate · رفيقك الذكي في كل نقلة",
+  "shortcuts": "الاختصارات",
+  "sc_startstop": "بدء / إيقاف",
+  "sc_white": "الأبيض",
+  "sc_black": "الأسود",
+  "sc_mode": "تلقائي / إبراز",
+  "sc_theme": "تغيير المظهر",
+  "sc_calibrate": "إعادة معايرة الرقعة",
+
+  "calibrate": "🎯 معايرة",
+  "calibrating": "جاري البحث عن الرقعة…",
+  "calibrated": "تم العثور على الرقعة: {size} بكسل عند ({left}, {top})",
+
+  "status_watching": "مراقبة الرقعة…",
+  "status_thinking": "جاري التفكير…",
+  "status_playing": "تنفيذ النقلة…",
+
+  "checkmate": "كش مات!",
+  "stalemate": "تعادل بالجمود",
+  "game_over": "انتهت المباراة",
+  "confidence": "الثقة",
+  "mate_in": "مات في {n}",
+
+  "err_engine": "المحرك غير متاح: {detail}",
+  "err_vision": "تعذّرت قراءة الرقعة: {detail}",
+  "err_model": "نموذج التعرّف غير متاح: {detail}",
+  "err_llm": "نموذج اللغة غير متاح ({detail}) — تحليل المحرك فقط",
+  "err_generic": "خطأ: {detail}",
+  "err_autoplay": "لم يتم تأكيد النقلة على الشاشة — إعادة المزامنة",
+
+  "llm_system": "أنت أستاذ كبير في الشطرنج.",
+  "llm_rule": "اختر نقلة واحدة بالضبط من القائمة أدناه؛ لا تخترع أبداً نقلة أخرى.",
+  "llm_explain_hint": "جملتان أو ثلاث باللغة العربية",
+  "llm_side_white": "الأبيض",
+  "llm_side_black": "الأسود"
 }

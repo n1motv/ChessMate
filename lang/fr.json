@@ -9,5 +9,41 @@
   "eval": "Éval",
   "error": "Erreur",
   "mode_auto": "Jeu automatique",
-  "mode_manual": "Surlignage uniquement"
+  "mode_manual": "Surlignage uniquement",
+
+  "app_title": "ChessMate · votre ami IA à chaque coup",
+  "shortcuts": "Raccourcis",
+  "sc_startstop": "Démarrer / Arrêter",
+  "sc_white": "Blancs",
+  "sc_black": "Noirs",
+  "sc_mode": "Auto / Surlignage",
+  "sc_theme": "Changer de thème",
+  "sc_calibrate": "Recalibrer le plateau",
+
+  "calibrate": "🎯 Calibrer",
+  "calibrating": "Recherche du plateau…",
+  "calibrated": "Plateau trouvé : {size} px en ({left}, {top})",
+
+  "status_watching": "Surveillance du plateau…",
+  "status_thinking": "Réflexion…",
+  "status_playing": "Exécution du coup…",
+
+  "checkmate": "Échec et mat !",
+  "stalemate": "Pat — partie nulle",
+  "game_over": "Partie terminée",
+  "confidence": "Confiance",
+  "mate_in": "Mat en {n}",
+
+  "err_engine": "Moteur indisponible : {detail}",
+  "err_vision": "Lecture du plateau impossible : {detail}",
+  "err_model": "Modèle de reconnaissance indisponible : {detail}",
+  "err_llm": "LLM indisponible ({detail}) — analyse moteur seule",
+  "err_generic": "Erreur : {detail}",
+  "err_autoplay": "Coup non confirmé à l'écran — resynchronisation",
+
+  "llm_system": "Tu es un grand-maître d'échecs.",
+  "llm_rule": "Choisis exactement un coup de la liste ci-dessous ; n'invente jamais un autre coup.",
+  "llm_explain_hint": "2 à 3 phrases en français",
+  "llm_side_white": "Blancs",
+  "llm_side_black": "Noirs"
 }

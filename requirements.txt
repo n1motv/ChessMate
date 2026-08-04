@@ -1,40 +1,41 @@
+# ChessMate — dépendances complètes.
 #
-# ───── Core GUI ───────────────────────────────────────────
+# La version précédente omettait torch et torchvision, dont dépendent
+# resnet18_chess.pt et train_resnet.py, et se terminait sur un commentaire
+# « Custom module (replace URL if private) » suivi de rien : le module
+# ChessToFEN importé par vision.py n'était donc installable nulle part.
+# Ce module est désormais intégré au dépôt (classifier.py) : plus de
+# dépendance fantôme.
 #
-PySide6
-qt-material
+#     python -m pip install -r requirements.txt
+#
+# Pour une installation GPU (CUDA), installez torch séparément en suivant
+# https://pytorch.org/get-started/locally/ AVANT de lancer cette commande.
 
-#
-# ───── Chess / AI logic ───────────────────────────────────
-#
-python-chess
-requests
+# ───── Interface graphique ─────────────────────────────────────────
+PySide6>=6.6,<7
+qt-material>=2.14
 
-#
-# ───── Screen-capture + vision ────────────────────────────
-#
-mss
-opencv-python
-numpy
-Pillow
+# ───── Échecs ──────────────────────────────────────────────────────
+chess>=1.10                 # le paquet PyPI de python-chess s'appelle « chess »
 
-#
-# ───── Mouse / automation ─────────────────────────────────
-#
-pyautogui
-pymsgbox
-pygetwindow
-pytweening
-PyTweening
-mouseinfo
-pyrect
+# ───── Vision / modèle ─────────────────────────────────────────────
+torch>=2.2
+torchvision>=0.17
+opencv-python>=4.9
+numpy>=1.26
+Pillow>=10.0
+mss>=9.0
 
-#
-# ───── Utility / misc ─────────────────────────────────────
-#
-textwrap3
-typing-extensions>=4.10 # for __future__ annotations on 3.10/3.11
+# ───── Réseau (LLM local, API compatible OpenAI) ───────────────────
+requests>=2.31
 
-#
-# ───── Custom module (replace URL if private) ─────────────
-#
+# ───── Automatisation de la souris ─────────────────────────────────
+pyautogui>=0.9.54
+
+# ───── Compatibilité ───────────────────────────────────────────────
+typing-extensions>=4.10 ; python_version < "3.11"
+
+# Retiré : textwrap3 (le module textwrap de la bibliothèque standard suffit),
+# ainsi que pymsgbox / pygetwindow / pytweening / mouseinfo / pyrect, qui sont
+# des dépendances internes de pyautogui et n'ont pas à être listées ici.

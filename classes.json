@@ -1,0 +1,15 @@
+[
+  "bishop_dark",
+  "bishop_light",
+  "empty",
+  "king_dark",
+  "king_light",
+  "knight_dark",
+  "knight_light",
+  "pawn_dark",
+  "pawn_light",
+  "queen_dark",
+  "queen_light",
+  "rook_dark",
+  "rook_light"
+]

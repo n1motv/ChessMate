@@ -9,5 +9,41 @@
   "eval": "Eval",
   "error": "Error",
   "mode_auto": "Auto-play",
-  "mode_manual": "Highlight only"
+  "mode_manual": "Highlight only",
+
+  "app_title": "ChessMate · your AI friend on every move",
+  "shortcuts": "Shortcuts",
+  "sc_startstop": "Start / Stop",
+  "sc_white": "White",
+  "sc_black": "Black",
+  "sc_mode": "Auto / Highlight",
+  "sc_theme": "Toggle theme",
+  "sc_calibrate": "Recalibrate board",
+
+  "calibrate": "🎯 Calibrate",
+  "calibrating": "Looking for the board…",
+  "calibrated": "Board found: {size} px at ({left}, {top})",
+
+  "status_watching": "Watching the board…",
+  "status_thinking": "Thinking…",
+  "status_playing": "Playing the move…",
+
+  "checkmate": "Checkmate!",
+  "stalemate": "Stalemate — draw",
+  "game_over": "Game over",
+  "confidence": "Confidence",
+  "mate_in": "Mate in {n}",
+
+  "err_engine": "Engine unavailable: {detail}",
+  "err_vision": "Cannot read the board: {detail}",
+  "err_model": "Recognition model unavailable: {detail}",
+  "err_llm": "LLM unavailable ({detail}) — engine-only analysis",
+  "err_generic": "Error: {detail}",
+  "err_autoplay": "Move not confirmed on screen — resynchronising",
+
+  "llm_system": "You are a chess grandmaster.",
+  "llm_rule": "Choose exactly one move from the list below; never invent another move.",
+  "llm_explain_hint": "2 to 3 sentences in English",
+  "llm_side_white": "White",
+  "llm_side_black": "Black"
 }

@@ -9,5 +9,41 @@
   "eval": "Eval",
   "error": "Error",
   "mode_auto": "Jugada automática",
-  "mode_manual": "Solo resaltar"
+  "mode_manual": "Solo resaltar",
+
+  "app_title": "ChessMate · tu amigo IA en cada jugada",
+  "shortcuts": "Atajos",
+  "sc_startstop": "Iniciar / Detener",
+  "sc_white": "Blancas",
+  "sc_black": "Negras",
+  "sc_mode": "Auto / Resaltar",
+  "sc_theme": "Cambiar tema",
+  "sc_calibrate": "Recalibrar el tablero",
+
+  "calibrate": "🎯 Calibrar",
+  "calibrating": "Buscando el tablero…",
+  "calibrated": "Tablero encontrado: {size} px en ({left}, {top})",
+
+  "status_watching": "Vigilando el tablero…",
+  "status_thinking": "Pensando…",
+  "status_playing": "Ejecutando la jugada…",
+
+  "checkmate": "¡Jaque mate!",
+  "stalemate": "Ahogado — tablas",
+  "game_over": "Partida terminada",
+  "confidence": "Confianza",
+  "mate_in": "Mate en {n}",
+
+  "err_engine": "Motor no disponible: {detail}",
+  "err_vision": "No se puede leer el tablero: {detail}",
+  "err_model": "Modelo de reconocimiento no disponible: {detail}",
+  "err_llm": "LLM no disponible ({detail}) — solo análisis del motor",
+  "err_generic": "Error: {detail}",
+  "err_autoplay": "Jugada no confirmada en pantalla — resincronizando",
+
+  "llm_system": "Eres un gran maestro de ajedrez.",
+  "llm_rule": "Elige exactamente una jugada de la lista siguiente; nunca inventes otra.",
+  "llm_explain_hint": "2 o 3 frases en español",
+  "llm_side_white": "Blancas",
+  "llm_side_black": "Negras"
 }

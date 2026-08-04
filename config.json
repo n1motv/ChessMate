@@ -1,0 +1,23 @@
+{
+  "monitor": 1,
+  "boards": {},
+  "min_square_confidence": 0.8,
+  "max_uncertain_squares": 0,
+  "dump_squares": false,
+  "engine_profile": "blitz",
+  "engine_threads": null,
+  "engine_hash_mb": null,
+  "llm_enabled": true,
+  "llm_timeout": 12.0,
+  "llm_retries": 1,
+  "autoplay_style": "click",
+  "autoplay_verify": true,
+  "promotion_order": [
+    "q",
+    "n",
+    "r",
+    "b"
+  ],
+  "theme_dark": true,
+  "language": null
+}

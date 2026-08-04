@@ -9,5 +9,41 @@
   "eval": "Оценка",
   "error": "Ошибка",
   "mode_auto": "Автоход",
-  "mode_manual": "Только подсветка"
+  "mode_manual": "Только подсветка",
+
+  "app_title": "ChessMate · ваш ИИ-помощник на каждом ходу",
+  "shortcuts": "Горячие клавиши",
+  "sc_startstop": "Старт / Стоп",
+  "sc_white": "Белые",
+  "sc_black": "Чёрные",
+  "sc_mode": "Авто / Подсветка",
+  "sc_theme": "Сменить тему",
+  "sc_calibrate": "Перекалибровать доску",
+
+  "calibrate": "🎯 Калибровать",
+  "calibrating": "Поиск доски…",
+  "calibrated": "Доска найдена: {size} px в ({left}, {top})",
+
+  "status_watching": "Наблюдение за доской…",
+  "status_thinking": "Думаю…",
+  "status_playing": "Выполнение хода…",
+
+  "checkmate": "Мат!",
+  "stalemate": "Пат — ничья",
+  "game_over": "Партия окончена",
+  "confidence": "Уверенность",
+  "mate_in": "Мат в {n}",
+
+  "err_engine": "Движок недоступен: {detail}",
+  "err_vision": "Не удалось прочитать доску: {detail}",
+  "err_model": "Модель распознавания недоступна: {detail}",
+  "err_llm": "LLM недоступен ({detail}) — только анализ движка",
+  "err_generic": "Ошибка: {detail}",
+  "err_autoplay": "Ход не подтверждён на экране — пересинхронизация",
+
+  "llm_system": "Ты гроссмейстер по шахматам.",
+  "llm_rule": "Выбери ровно один ход из списка ниже; никогда не придумывай другой.",
+  "llm_explain_hint": "2–3 предложения на русском языке",
+  "llm_side_white": "Белые",
+  "llm_side_black": "Чёрные"
 }

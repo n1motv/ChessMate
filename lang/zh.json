@@ -9,5 +9,41 @@
   "eval": "评估",
   "error": "错误",
   "mode_auto": "自动下棋",
-  "mode_manual": "仅高亮"
+  "mode_manual": "仅高亮",
+
+  "app_title": "ChessMate · 每一步都有 AI 伙伴",
+  "shortcuts": "快捷键",
+  "sc_startstop": "开始 / 停止",
+  "sc_white": "白方",
+  "sc_black": "黑方",
+  "sc_mode": "自动 / 高亮",
+  "sc_theme": "切换主题",
+  "sc_calibrate": "重新校准棋盘",
+
+  "calibrate": "🎯 校准",
+  "calibrating": "正在查找棋盘…",
+  "calibrated": "已找到棋盘：{size} 像素，位于 ({left}, {top})",
+
+  "status_watching": "正在监视棋盘…",
+  "status_thinking": "思考中…",
+  "status_playing": "正在走子…",
+
+  "checkmate": "将死！",
+  "stalemate": "逼和 — 和棋",
+  "game_over": "对局结束",
+  "confidence": "置信度",
+  "mate_in": "{n} 步将死",
+
+  "err_engine": "引擎不可用：{detail}",
+  "err_vision": "无法读取棋盘：{detail}",
+  "err_model": "识别模型不可用：{detail}",
+  "err_llm": "LLM 不可用（{detail}）— 仅使用引擎分析",
+  "err_generic": "错误：{detail}",
+  "err_autoplay": "屏幕上未确认该走法 — 正在重新同步",
+
+  "llm_system": "你是一位国际象棋特级大师。",
+  "llm_rule": "请从下面的列表中恰好选择一个走法；绝不要自行发明走法。",
+  "llm_explain_hint": "用中文写 2 到 3 句话",
+  "llm_side_white": "白方",
+  "llm_side_black": "黑方"
 }
