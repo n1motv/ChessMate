@@ -72,9 +72,12 @@ from worker import Analysis, AnalysisError, Analyzer
 
 log = logging.getLogger(__name__)
 
-ICON_SZ = 92
-SIDEBAR_W = 272
-HINT_W = 420          # largeur du texte d'accueil, en px logiques
+ICON_SZ = 76
+#: la barre latérale ne se réduit pas librement : les QCheckBox et QPushButton
+#: de Qt tronquent leur texte au lieu de l'abréger. Mesuré sur les six
+#: langues, le libellé le plus long en réclame 224 ; on garde une marge.
+SIDEBAR_W = 240
+HINT_W = 290          # largeur du texte d'accueil, en px logiques
 
 #: (touche affichée, clé i18n) — sert au panneau des raccourcis ET aux
 #: infobulles, pour qu'un ajout ne puisse plus être oublié d'un côté.
@@ -264,8 +267,8 @@ class ChessHelper(QWidget):
     def _build_ui(self) -> None:
         self.setObjectName("root")
         self.setWindowTitle(self.T("app_title"))
-        self.setMinimumSize(920, 660)
-        self.resize(1020, 700)
+        self.setMinimumSize(640, 620)
+        self.resize(714, 700)
         self._refresh_window_icon()
         self._sections: dict[str, QLabel] = {}
 

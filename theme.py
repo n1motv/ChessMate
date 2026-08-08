@@ -351,7 +351,7 @@ QPushButton#segment:checked {{
 QCheckBox {{
     color: {t['text_muted']};
     spacing: 10px;
-    font-size: 13px;
+    font-size: 12px;
     padding: 3px 0;
 }}
 QCheckBox:hover {{ color: {t['text']}; }}
