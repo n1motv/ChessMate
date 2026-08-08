@@ -74,30 +74,49 @@ class BoardGeometry:
 
 
 # ── capture ─────────────────────────────────────────────────────────
+def _resolve_monitor(monitors: list, monitor: int) -> int:
+    """
+    Ramène `monitor` à un index d'écran réellement branché.
+
+    `config.json` mémorise le dernier écran utilisé, mais ce fichier suit le
+    projet d'une machine à l'autre (et un écran peut être débranché entre
+    deux lancements) : l'écran n°2 d'hier n'existe pas forcément aujourd'hui.
+    Sans ce garde-fou, `sct.monitors[2]` levait un `IndexError` à chaque
+    analyse au lieu de retomber sur l'écran principal.
+    """
+    if len(monitors) < 2:                     # index 0 = « tous les écrans »
+        raise VisionError("Aucun écran détecté.")
+    if 1 <= monitor < len(monitors):
+        return monitor
+    log.warning(
+        "Écran %s indisponible (%s écran(s) détecté(s)) — repli sur l'écran 1.",
+        monitor, len(monitors) - 1,
+    )
+    return 1
+
+
 def grab_screen(monitor: int = 1) -> np.ndarray:
     """Capture l'écran `monitor` → image BGR."""
     with mss.mss() as sct:
-        if monitor >= len(sct.monitors):
-            raise VisionError(
-                f"Écran {monitor} inexistant "
-                f"({len(sct.monitors) - 1} écran(s) détecté(s))."
-            )
-        shot = sct.grab(sct.monitors[monitor])
+        shot = sct.grab(sct.monitors[_resolve_monitor(sct.monitors, monitor)])
         return cv2.cvtColor(np.array(shot), cv2.COLOR_BGRA2BGR)
 
 
-def screen_size(monitor: int = 1) -> tuple[int, int]:
+def monitor_bounds(monitor: int = 1) -> tuple[int, int, int, int]:
+    """(left, top, width, height) de l'écran, en coordonnées globales."""
     with mss.mss() as sct:
-        mon = sct.monitors[monitor]
-        return int(mon["width"]), int(mon["height"])
+        mon = sct.monitors[_resolve_monitor(sct.monitors, monitor)]
+        return int(mon["left"]), int(mon["top"]), int(mon["width"]), int(mon["height"])
+
+
+def screen_size(monitor: int = 1) -> tuple[int, int]:
+    return monitor_bounds(monitor)[2:]
 
 
 @functools.lru_cache(maxsize=8)
 def monitor_origin(monitor: int = 1) -> tuple[int, int]:
     """Coin haut-gauche de l'écran dans l'espace de coordonnées global."""
-    with mss.mss() as sct:
-        mon = sct.monitors[monitor]
-        return int(mon["left"]), int(mon["top"])
+    return monitor_bounds(monitor)[:2]
 
 
 def available_monitors() -> list[int]:
@@ -216,6 +235,17 @@ def detect_board_region(monitor: int | None = 1,
     return best[1]
 
 
+def _fits_monitor(geom: BoardGeometry) -> bool:
+    """Le plateau tient-il entièrement dans les limites de son écran ?"""
+    left, top, width, height = monitor_bounds(geom.monitor)
+    return (
+        geom.size > 0
+        and geom.left >= left and geom.top >= top
+        and geom.left + geom.size <= left + width
+        and geom.top + geom.size <= top + height
+    )
+
+
 # ── localisateur avec cache + persistance ───────────────────────────
 class BoardLocator:
     """
@@ -228,8 +258,17 @@ class BoardLocator:
         # un écran explicitement demandé (CLI `--monitor`) reste figé ; sinon
         # on part du dernier écran connu (config.json) mais on est prêt à
         # rebalayer tous les écrans si la position mémorisée ne suffit plus.
+        # Dans les deux cas l'index est validé : celui de config.json peut
+        # venir d'une autre machine, celui de la CLI d'une faute de frappe.
         self._pinned = monitor is not None
-        self.monitor = monitor if monitor is not None else config.get("monitor", 1)
+        requested = monitor if monitor is not None else config.get("monitor", 1)
+        try:
+            with mss.mss() as sct:
+                self.monitor = _resolve_monitor(sct.monitors, requested)
+        except (VisionError, mss.exception.ScreenShotError):
+            # aucun écran exploitable au démarrage : on n'empêche pas la
+            # fenêtre de s'ouvrir, `get()` signalera l'erreur au moment utile.
+            self.monitor = 1
         # l'interface graphique désactive ce balayage : l'utilisateur choisit
         # toujours l'échiquier à la souris (voir calibration.py), la
         # détection par contours reste disponible pour la CLI/les tests.
@@ -246,9 +285,20 @@ class BoardLocator:
             if not refresh:
                 saved = config.get_board_rect(*screen_size(self.monitor))
                 if saved:
-                    self._geom = BoardGeometry(*saved, monitor=self.monitor)
-                    log.info("Plateau repris de config.json : %s", self._geom)
-                    return self._geom
+                    geom = BoardGeometry(*saved, monitor=self.monitor)
+                    # les rectangles sont indexés par résolution seulement :
+                    # celui d'un écran 1920×1080 d'une autre machine (ou d'un
+                    # second écran depuis débranché) tombe hors du bureau
+                    # actuel. On le jette plutôt que de capturer dans le vide.
+                    if _fits_monitor(geom):
+                        self._geom = geom
+                        log.info("Plateau repris de config.json : %s", geom)
+                        return geom
+                    log.warning(
+                        "Calibration mémorisée hors de l'écran %s (%s) — ignorée.",
+                        self.monitor, geom,
+                    )
+                    config.clear_board_rect(*screen_size(self.monitor))
 
             if not self._auto_detect:
                 raise VisionError(

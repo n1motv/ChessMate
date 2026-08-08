@@ -63,8 +63,8 @@ DEFAULTS: dict[str, Any] = {
     # on attend un délai aléatoire dans cet intervalle (secondes) pour ne
     # pas trahir un temps de réaction inhumain. Le coup suggéré reste
     # affiché pendant l'attente ; seul le clic/glisser est différé.
-    "autoplay_delay_min": 6.0,
-    "autoplay_delay_max": 15.0,
+    "autoplay_delay_min": 3.0,
+    "autoplay_delay_max": 7.0,
     # ordre des pièces dans le sélecteur de promotion, du haut vers le bas,
     # tel qu'affiché par chess.com et lichess sur la colonne de promotion
     "promotion_order": ["q", "n", "r", "b"],

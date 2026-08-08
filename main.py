@@ -688,8 +688,8 @@ class ChessHelper(QWidget):
 
         if self._mode() == "auto":
             delay = random.uniform(
-                float(config.get("autoplay_delay_min", 6.0)),
-                float(config.get("autoplay_delay_max", 15.0)),
+                float(config.get("autoplay_delay_min", 3.0)),
+                float(config.get("autoplay_delay_max", 7.0)),
             )
             self.set_status(self.T("status_delay"), transient=True)
             thread = self.thread

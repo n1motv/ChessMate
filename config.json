@@ -5,6 +5,11 @@
       "left": -1563,
       "top": 301,
       "size": 851
+    },
+    "1920x1200": {
+      "left": 64,
+      "top": 340,
+      "size": 684
     }
   },
   "min_square_confidence": 0.75,
@@ -21,8 +26,8 @@
   "humanize_temperature": 0.08,
   "autoplay_style": "click",
   "autoplay_verify": true,
-  "autoplay_delay_min": 6.0,
-  "autoplay_delay_max": 15.0,
+  "autoplay_delay_min": 3.0,
+  "autoplay_delay_max": 7.0,
   "promotion_order": [
     "q",
     "n",
