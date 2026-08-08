@@ -21,7 +21,12 @@ from PySide6.QtCore import QPointF, Qt, QTimer
 from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
-ARROW_COLOR = "#00e8ff"
+import theme
+
+#: la flèche se pose sur le plateau réel, pas sur l'interface : on prend
+#: toujours l'accent « sombre », le plus lumineux des deux, pour rester
+#: lisible quel que soit le thème du site d'échecs.
+ARROW_COLOR = theme.DARK["accent"]
 
 
 class BoardOverlay(QWidget):

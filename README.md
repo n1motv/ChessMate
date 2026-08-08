@@ -206,6 +206,7 @@ python tests/test_pipeline.py   # chaîne complète sur les imagettes de data/
 
 ```
 main.py        interface Qt + orchestration (QThread + signaux)
+ ├── theme.py      palette, typographie et feuille QSS des deux thèmes
  ├── worker.py     analyse pure, sans Qt : vision → FEN → moteur → LLM
  │    ├── vision.py      capture, localisation du plateau, découpe en 64 cases
  │    │    └── classifier.py   ResNet-18 (remplace l'ancien module ChessToFEN)

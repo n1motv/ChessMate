@@ -14,7 +14,10 @@
 
 # ───── Interface graphique ─────────────────────────────────────────
 PySide6>=6.6,<7
-qt-material>=2.14
+# qt-material retiré : il posait un thème complet par-dessus lequel l'app
+# empilait ses propres feuilles QSS, d'où des contrôles aux couleurs
+# incohérentes et l'avertissement « The style 'Fusion' does not exist ».
+# Tout le style vient maintenant de theme.py.
 
 # ───── Échecs ──────────────────────────────────────────────────────
 chess>=1.10                 # le paquet PyPI de python-chess s'appelle « chess »

@@ -68,6 +68,16 @@ def test_assets_referenced_by_the_ui_exist():
             assert (FLAGS_DIR / flag).exists(), f"assets/flags/{flag} manquant"
 
 
+def test_ui_labels_are_translated_in_every_language():
+    """Les intitulés introduits par la refonte doivent exister partout."""
+    keys = ["app_tagline", "white_short", "black_short", "sec_color",
+            "sec_mode", "sec_options", "sec_board", "idle_title",
+            "idle_hint", "status_ready"]
+    for code in i18n.available_codes():
+        for key in keys:
+            assert i18n.tr(code, key) != key, f"{code}: « {key} » non traduite"
+
+
 def test_main_window_builds_and_switches_language():
     """Instancie réellement la fenêtre : détecte les erreurs de construction."""
     from PySide6.QtCore import Qt
@@ -85,7 +95,9 @@ def test_main_window_builds_and_switches_language():
         for code in ("fr", "en", "ar", "zh"):
             window.lang = code
             window.apply_language()
-            assert window.start_btn.text() == i18n.tr(code, "start")
+            # bouton d'action unique : il porte « start » tant que l'analyse
+            # n'a pas démarré, « stop » ensuite.
+            assert window.run_btn.text() == i18n.tr(code, "start")
             expected = Qt.RightToLeft if i18n.is_rtl(code) else Qt.LeftToRight
             assert window.layoutDirection() == expected, f"RTL incorrect pour {code}"
 
@@ -94,6 +106,19 @@ def test_main_window_builds_and_switches_language():
         assert window.is_dark is False
         window.apply_theme(True)
         assert window.is_dark is True
+
+        # la feuille est régénérée, jamais concaténée : l'ancien
+        # `setStyleSheet(self.styleSheet() + …)` la faisait grossir à chaque
+        # bascule, en empilant des règles contradictoires.
+        size = len(app.styleSheet())
+        window.apply_theme(False)
+        window.apply_theme(True)
+        assert len(app.styleSheet()) == size
+
+        # une seule page de contenu visible à la fois (avant : le bandeau
+        # d'attente et la carte pouvaient l'être en même temps)
+        assert window.stack.count() == 2
+        assert window.stack.currentWidget() is not None
 
         # l'effet d'opacité existe bien (l'ancien fondu était un no-op)
         assert window.card_content.graphicsEffect() is window.card_opacity

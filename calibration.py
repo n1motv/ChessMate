@@ -18,12 +18,14 @@ from __future__ import annotations
 import mss
 from PySide6.QtCore import QPoint, QRect, Qt, Signal
 from PySide6.QtGui import (
-    QColor, QFont, QGuiApplication, QKeyEvent, QMouseEvent, QPainter, QPen,
-    QRegion,
+    QColor, QFont, QFontMetrics, QGuiApplication, QKeyEvent, QMouseEvent,
+    QPainter, QPen, QRegion,
 )
 from PySide6.QtWidgets import QWidget
 
-ACCENT = "#00e8ff"
+import theme
+
+ACCENT = theme.DARK["accent"]     # tracé sur un voile sombre : accent lumineux
 MIN_SELECTION = 20      # px logiques ; en dessous, on ignore (clic accidentel)
 
 
@@ -108,17 +110,33 @@ class ManualCalibrationOverlay(QWidget):
 
             painter.setPen(QPen(QColor(ACCENT), 2))
             painter.drawRect(local)
-            painter.setFont(QFont("Segoe UI", 10, QFont.DemiBold))
+            painter.setFont(theme.font(10, QFont.DemiBold))
             painter.setPen(QColor(ACCENT))
             painter.drawText(local.bottomLeft() + QPoint(4, 18),
                              f"{rect.width()} × {rect.height()} px")
         else:
             painter.fillRect(self.rect(), dim)
 
-        painter.setPen(QColor("white"))
-        painter.setFont(QFont("Segoe UI", 13, QFont.Bold))
-        painter.drawText(self.rect().adjusted(0, 28, 0, 0),
-                         Qt.AlignHCenter | Qt.AlignTop, self._hint)
+        self._draw_hint(painter)
+
+    def _draw_hint(self, painter: QPainter) -> None:
+        """
+        Consigne posée dans une pastille sombre plutôt qu'en texte blanc nu :
+        par-dessus un plateau clair, l'ancien libellé était illisible.
+        """
+        font = theme.font(12, QFont.Bold)
+        painter.setFont(font)
+        metrics = QFontMetrics(font)
+        text = metrics.elidedText(self._hint, Qt.ElideRight,
+                                  int(self.width() * 0.7))
+        box = metrics.boundingRect(text).adjusted(-18, -10, 18, 10)
+        box.moveCenter(QPoint(self.rect().center().x(), self.rect().top() + 54))
+
+        painter.setPen(QPen(QColor(theme.DARK["border_strong"]), 1))
+        painter.setBrush(QColor(11, 17, 32, 235))       # theme.DARK["bg"] opaque
+        painter.drawRoundedRect(box, 12, 12)
+        painter.setPen(QColor(theme.DARK["text"]))
+        painter.drawText(box, Qt.AlignCenter, text)
 
 
 def rect_to_geometry(rect: QRect) -> tuple[int, int, int, int]:

@@ -57,7 +57,6 @@ l'utilisateur installer Stockfish lui-même : ChessMate le cherche déjà dans l
 | Composant | Licence | Rôle |
 |-----------|---------|------|
 | PySide6 (Qt for Python) | LGPL v3 | interface graphique |
-| qt-material | BSD-2-Clause | thème visuel |
 | python-chess | GPL v3 *(bibliothèque Python, liaison dynamique)* | règles du jeu, protocole UCI |
 | PyTorch / torchvision | BSD-3-Clause | classifieur de cases |
 | OpenCV | Apache 2.0 | détection du plateau |
