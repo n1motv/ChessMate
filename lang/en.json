@@ -10,6 +10,10 @@
   "error": "Error",
   "mode_auto": "Auto-play",
   "mode_manual": "Highlight only",
+  "llm_toggle": "🧠 AI commentary",
+  "llm_toggle_hint": "Turn the local AI's move commentary on or off. When off, the chosen move is still played, just without an explanation.",
+  "flip_board": "⇅ Board flipped",
+  "flip_board_hint": "Check this if the board shown on screen is physically flipped (Black at the bottom). Some sites don't flip the display even when you play Black: uncheck it in that case.",
 
   "app_title": "ChessMate · your AI friend on every move",
   "shortcuts": "Shortcuts",
@@ -21,11 +25,13 @@
   "sc_calibrate": "Recalibrate board",
 
   "calibrate": "🎯 Calibrate",
-  "calibrating": "Looking for the board…",
   "calibrated": "Board found: {size} px at ({left}, {top})",
+  "calibrate_manual_hint": "Automatic detection failed: drag a box around the board (right-click or Esc to cancel)",
+  "calibrate_manual_cancelled": "Manual calibration cancelled.",
 
   "status_watching": "Watching the board…",
   "status_thinking": "Thinking…",
+  "status_delay": "Move found — playing it in a moment…",
   "status_playing": "Playing the move…",
 
   "checkmate": "Checkmate!",
@@ -42,7 +48,7 @@
   "err_autoplay": "Move not confirmed on screen — resynchronising",
 
   "llm_system": "You are a chess grandmaster.",
-  "llm_rule": "Choose exactly one move from the list below; never invent another move.",
+  "llm_rule": "Explain only the move given to you; never suggest a different move.",
   "llm_explain_hint": "2 to 3 sentences in English",
   "llm_side_white": "White",
   "llm_side_black": "Black"

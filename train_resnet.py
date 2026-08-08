@@ -31,6 +31,7 @@ from collections import Counter
 import numpy as np
 import torch
 import torch.nn as nn
+from PIL import Image
 from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 
@@ -47,16 +48,45 @@ def set_seed(seed: int) -> None:
     torch.cuda.manual_seed_all(seed)
 
 
+class RandomSquareHighlight:
+    """
+    Simule le surlignage coloré qu'appliquent la plupart des sites (dernier
+    coup joué, case sélectionnée...) à certaines cases : jaune sur lichess/
+    chess.com, parfois vert ou bleu selon le thème.  Le dataset ne contenait
+    jusqu'ici aucune case teintée, ce qui faisait déraper la reconnaissance
+    dessus (ex. une case vide surlignée en jaune non reconnue comme vide).
+    """
+    _COLORS = (
+        (205, 210, 106),   # jaune clair (lichess, case claire)
+        (170, 162, 58),    # jaune foncé (lichess, case sombre)
+        (247, 247, 105),   # jaune vif (chess.com)
+        (130, 151, 105),   # vert (case sélectionnée)
+        (148, 179, 212),   # bleu (case sélectionnée, certains thèmes)
+    )
+
+    def __init__(self, p: float = 0.3, alpha_range: tuple[float, float] = (0.15, 0.4)):
+        self.p = p
+        self.alpha_range = alpha_range
+
+    def __call__(self, img: Image.Image) -> Image.Image:
+        if random.random() > self.p:
+            return img
+        overlay = Image.new("RGB", img.size, random.choice(self._COLORS))
+        return Image.blend(img, overlay, random.uniform(*self.alpha_range))
+
+
 def build_transforms() -> tuple[transforms.Compose, transforms.Compose]:
     """
     Augmentations *plausibles* pour des captures d'écran : léger recadrage,
     variations de luminosité/contraste (thèmes clairs et sombres), rotation
-    d'un degré ou deux (imprécision de calibration).  Pas de miroir.
+    d'un degré ou deux (imprécision de calibration), surlignage occasionnel
+    d'une case. Pas de miroir.
     """
     train = transforms.Compose([
         transforms.Resize((INPUT_SIZE, INPUT_SIZE)),
         transforms.RandomAffine(degrees=3, translate=(0.05, 0.05), scale=(0.92, 1.08)),
         transforms.ColorJitter(brightness=0.25, contrast=0.25, saturation=0.15),
+        RandomSquareHighlight(),
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
         transforms.RandomErasing(p=0.15, scale=(0.02, 0.08)),

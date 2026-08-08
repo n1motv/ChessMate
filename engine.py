@@ -104,12 +104,12 @@ class Profile:
 
 
 PROFILES: dict[str, Profile] = {
-    "bullet":   Profile("bullet",   movetime=0.25, hash_mb=256,  depth_cap=20, slow_mover=60),
-    "blitz":    Profile("blitz",    movetime=0.80, hash_mb=512,  depth_cap=26, slow_mover=75),
-    "rapid":    Profile("rapid",    movetime=2.50, hash_mb=1024, depth_cap=32, slow_mover=90),
-    "analysis": Profile("analysis", movetime=8.00, hash_mb=2048, depth_cap=None, slow_mover=100),
+    "bullet":   Profile("bullet",   movetime=0.35,  hash_mb=256,  depth_cap=22, slow_mover=60),
+    "blitz":    Profile("blitz",    movetime=1.20,  hash_mb=512,  depth_cap=30, slow_mover=75),
+    "rapid":    Profile("rapid",    movetime=3.50,  hash_mb=1024, depth_cap=34, slow_mover=90),
+    "analysis": Profile("analysis", movetime=10.00, hash_mb=2048, depth_cap=None, slow_mover=100),
 }
-DEFAULT_PROFILE = "blitz"
+DEFAULT_PROFILE = "rapid"
 
 
 @dataclass

@@ -10,6 +10,10 @@
   "error": "Error",
   "mode_auto": "Jugada automática",
   "mode_manual": "Solo resaltar",
+  "llm_toggle": "🧠 Comentario IA",
+  "llm_toggle_hint": "Activa o desactiva el comentario de la IA local. Si está desactivado, la jugada elegida se juega igual, solo que sin explicación.",
+  "flip_board": "⇅ Tablero girado",
+  "flip_board_hint": "Marca esta opción si el tablero mostrado en pantalla está físicamente girado (negras abajo). Algunos sitios no giran la vista aunque juegues con negras: desmárcala en ese caso.",
 
   "app_title": "ChessMate · tu amigo IA en cada jugada",
   "shortcuts": "Atajos",
@@ -21,11 +25,13 @@
   "sc_calibrate": "Recalibrar el tablero",
 
   "calibrate": "🎯 Calibrar",
-  "calibrating": "Buscando el tablero…",
   "calibrated": "Tablero encontrado: {size} px en ({left}, {top})",
+  "calibrate_manual_hint": "La detección automática falló: dibuja un rectángulo alrededor del tablero (clic derecho o Esc para cancelar)",
+  "calibrate_manual_cancelled": "Calibración manual cancelada.",
 
   "status_watching": "Vigilando el tablero…",
   "status_thinking": "Pensando…",
+  "status_delay": "Jugada encontrada — la jugaré en un momento…",
   "status_playing": "Ejecutando la jugada…",
 
   "checkmate": "¡Jaque mate!",
@@ -42,7 +48,7 @@
   "err_autoplay": "Jugada no confirmada en pantalla — resincronizando",
 
   "llm_system": "Eres un gran maestro de ajedrez.",
-  "llm_rule": "Elige exactamente una jugada de la lista siguiente; nunca inventes otra.",
+  "llm_rule": "Explica únicamente la jugada indicada; nunca sugieras otra.",
   "llm_explain_hint": "2 o 3 frases en español",
   "llm_side_white": "Blancas",
   "llm_side_black": "Negras"

@@ -19,7 +19,9 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
+import random
 import re
 import textwrap
 import time
@@ -31,7 +33,6 @@ import requests
 import config
 import i18n
 from engine import MoveSuggestion, get_engine
-from utils import ensure_san
 
 log = logging.getLogger(__name__)
 
@@ -137,17 +138,43 @@ def _post_chat(messages: list[dict], *, timeout: float, retries: int) -> str:
     raise last or LLMError("échec inconnu")
 
 
+# ── style de jeu : un peu de variété entre coups quasi équivalents ───
+def _humanize_choice(top: list[MoveSuggestion]) -> MoveSuggestion:
+    """
+    Choisit parmi `top` (déjà trié du meilleur au pire par le moteur) —
+    la plupart du temps le meilleur coup, mais avec une chance de préférer
+    une alternative *presque* aussi bonne, pour un style moins mécanique.
+
+    On ne dévie jamais d'un mat forcé, et jamais vers un coup dont l'écart
+    d'évaluation dépasse `humanize_margin` pawns : ça ne joue donc jamais un
+    coup objectivement plus faible, juste parfois un autre coup tout aussi
+    solide.
+    """
+    best = top[0]
+    if not config.get("humanize_moves", True) or best.is_mate or len(top) <= 1:
+        return best
+
+    margin = float(config.get("humanize_margin", 0.15))
+    close = [m for m in top if not m.is_mate
+             and (best.score_pawns - m.score_pawns) <= margin]
+    if len(close) <= 1:
+        return best
+
+    temperature = max(1e-3, float(config.get("humanize_temperature", 0.08)))
+    weights = [math.exp(-(best.score_pawns - m.score_pawns) / temperature) for m in close]
+    return random.choices(close, weights=weights, k=1)[0]
+
+
 # ── prompt ──────────────────────────────────────────────────────────
-def _build_messages(fen: str, top: list[MoveSuggestion], lang: str) -> list[dict]:
+def _build_messages(fen: str, chosen: MoveSuggestion,
+                    top: list[MoveSuggestion], lang: str) -> list[dict]:
     board = chess.Board(fen)
     side_key = "llm_side_white" if board.turn == chess.WHITE else "llm_side_black"
 
-    menu = "\n".join(
-        f"{i + 1}. {s.san}  ({s.score_pawns:+.2f}"
-        + (f", {i18n.tr(lang, 'mate_in', n=abs(s.mate_in))}" if s.is_mate else "")
-        + f")  [{s.pv_san}]"
-        for i, s in enumerate(top)
-    )
+    others = [s for s in top if s.san != chosen.san]
+    alternatives = "\n".join(f"- {s.san} ({s.score_pawns:+.2f})" for s in others) or "(none)"
+    mate_note = (f", {i18n.tr(lang, 'mate_in', n=abs(chosen.mate_in))}"
+                if chosen.is_mate else "")
 
     system = f"{i18n.tr(lang, 'llm_system')} {i18n.tr(lang, 'llm_rule')}"
     user = textwrap.dedent(f"""\
@@ -156,14 +183,12 @@ def _build_messages(fen: str, top: list[MoveSuggestion], lang: str) -> list[dict
         Board:
         {board.unicode()}
 
-        Engine moves (best first):
-        {menu}
+        Move already decided, explain only this one: {chosen.san} ({chosen.score_pawns:+.2f}{mate_note}) [{chosen.pv_san}]
+        Other moves the engine considered (context only, do not suggest them): {alternatives}
 
         Reply STRICTLY with this JSON object and nothing else:
         {{
-          "move": "<exactly one SAN string copied from the list above>",
-          "explanation": "<{i18n.tr(lang, 'llm_explain_hint')}>",
-          "score": <numeric evaluation in pawns>
+          "explanation": "<{i18n.tr(lang, 'llm_explain_hint')}>"
         }}""")
 
     return [{"role": "system", "content": system},
@@ -176,60 +201,44 @@ def choose_move_and_explain(fen: str,
                             lang: str = "en",
                             top_n: int = 3) -> MoveChoice:
     """
-    Demande à Stockfish ses `top_n` meilleurs coups, puis au LLM d'en choisir
-    un et de l'expliquer dans la langue `lang`.
+    Demande à Stockfish ses `top_n` meilleurs coups, en retient un via
+    `_humanize_choice` (le meilleur la plupart du temps, parfois une
+    alternative quasi équivalente pour un style moins mécanique), puis
+    demande au LLM d'expliquer *ce* coup dans la langue `lang`.
 
-    Si le LLM est désactivé, injoignable ou incohérent, on renvoie **quand
-    même** le meilleur coup du moteur, avec `from_llm=False` et le motif dans
-    `error` : l'interface a toujours un coup jouable *et* de quoi expliquer à
-    l'utilisateur pourquoi il n'y a pas de commentaire.  L'ancienne version
-    faisait disparaître ces erreurs dans un `except Exception:` muet.
+    Le choix du coup ne dépend jamais du LLM : c'est toujours le moteur (plus
+    l'humanisation ci-dessus) qui décide, ce qui garantit un coup solide même
+    si le LLM est désactivé, injoignable ou répond n'importe quoi. Dans ce
+    cas on renvoie quand même le coup choisi, avec `from_llm=False` et le
+    motif dans `error` : l'interface a toujours un coup jouable *et* de quoi
+    expliquer à l'utilisateur pourquoi il n'y a pas de commentaire.
 
     Seules les erreurs *moteur* remontent : sans coup, il n'y a rien à faire.
     """
     top = get_engine().top_moves(fen, color, n=top_n)   # peut lever EngineError
+    chosen = _humanize_choice(top)
 
-    def _from_engine(reason: str | None) -> MoveChoice:
-        best = top[0]
+    def _without_explanation(reason: str | None) -> MoveChoice:
         return MoveChoice(
-            san=best.san,
+            san=chosen.san,
             explanation="",
-            score_pawns=best.score_pawns,
-            mate_in=best.mate_in,
-            pv_san=best.pv_san,
+            score_pawns=chosen.score_pawns,
+            mate_in=chosen.mate_in,
+            pv_san=chosen.pv_san,
             from_llm=False,
             error=reason,
         )
 
     if not config.get("llm_enabled", True):
-        return _from_engine(None)
+        return _without_explanation(None)
 
     timeout = float(config.get("llm_timeout", 12.0))
     retries = int(config.get("llm_retries", 1))
 
     try:
-        raw = _post_chat(_build_messages(fen, top, lang),
+        raw = _post_chat(_build_messages(fen, chosen, top, lang),
                          timeout=timeout, retries=retries)
         data = _extract_json(raw)
-
-        move = str(data.get("move", "")).strip()
-        if not move:
-            raise LLMError("clé « move » absente de la réponse")
-
-        allowed = {s.san: s for s in top}
-        if move not in allowed:
-            # tolérance : le modèle a pu répondre en UCI plutôt qu'en SAN
-            try:
-                move = ensure_san(fen, move)
-            except ValueError:
-                move = ""
-            if move not in allowed:
-                raise LLMError(
-                    f"coup hors-liste (proposés : {', '.join(sorted(allowed))})"
-                )
-
-        chosen = allowed[move]
-        # L'évaluation vient du moteur : le LLM n'est pas fiable là-dessus.
         return MoveChoice(
             san=chosen.san,
             explanation=str(data.get("explanation", "")).strip(),
@@ -240,8 +249,8 @@ def choose_move_and_explain(fen: str,
         )
 
     except LLMError as exc:
-        log.info("LLM ignoré (%s) — repli sur le coup du moteur", exc)
-        return _from_engine(str(exc))
+        log.info("LLM ignoré (%s) — coup joué sans commentaire", exc)
+        return _without_explanation(str(exc))
     except Exception as exc:           # noqa: BLE001 — filet de sécurité
         log.warning("LLM : erreur inattendue (%s)", exc, exc_info=True)
-        return _from_engine(str(exc))
+        return _without_explanation(str(exc))

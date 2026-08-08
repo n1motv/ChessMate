@@ -25,6 +25,7 @@ Corrections apportées :
 from __future__ import annotations
 
 import logging
+import random
 import sys
 import threading
 import time
@@ -34,7 +35,7 @@ from PySide6.QtCore import (
 )
 from PySide6.QtGui import QColor, QFont, QIcon, QKeySequence, QPixmap, QShortcut
 from PySide6.QtWidgets import (
-    QApplication, QComboBox, QFrame, QGraphicsDropShadowEffect,
+    QApplication, QCheckBox, QComboBox, QFrame, QGraphicsDropShadowEffect,
     QGraphicsOpacityEffect, QGridLayout, QHBoxLayout, QLabel, QProgressBar,
     QPushButton, QRadioButton, QSizePolicy, QTextEdit, QVBoxLayout, QWidget,
 )
@@ -42,9 +43,11 @@ from PySide6.QtWidgets import (
 import config
 import i18n
 from autoplay import move_cursor_to, play_move
+from calibration import ManualCalibrationOverlay, rect_to_geometry
 from overlay import BoardOverlay
 from paths import ASSETS, FLAGS_DIR, LANG_DIR
 from utils import format_score
+from vision import BoardLocator
 from worker import Analysis, AnalysisError, Analyzer
 
 log = logging.getLogger(__name__)
@@ -95,12 +98,20 @@ class AnalysisThread(QThread):
         self._ack = threading.Event()
         self._side = "white"
         self._lang = "en"
+        self._flipped: bool | None = None
         self._verify_expected: str | None = None
         self._verify_side = "w"
 
     # ── pilotage depuis l'interface ─────────────────────────────────
-    def configure(self, side: str, lang: str) -> None:
-        self._side, self._lang = side, lang
+    def configure(self, side: str, lang: str, flipped: bool | None = None) -> None:
+        """
+        `flipped` : orientation réelle du plateau à l'écran, fournie
+        explicitement par l'utilisateur (case à cocher) plutôt que déduite
+        de la couleur jouée — certains sites n'inversent pas l'affichage
+        même quand on joue les Noirs, et deviner mène à lire (et jouer !)
+        un plateau en miroir.
+        """
+        self._side, self._lang, self._flipped = side, lang, flipped
 
     def acknowledge(self, *, expected_placement: str | None = None,
                     side_after: str = "w") -> None:
@@ -117,7 +128,8 @@ class AnalysisThread(QThread):
     def run(self) -> None:                                     # noqa: C901
         while not self._stop.is_set():
             try:
-                analysis = self._analyzer.analyse(self._side, self._lang)
+                analysis = self._analyzer.analyse(
+                    self._side, self._lang, flipped=self._flipped)
             except AnalysisError as exc:
                 self.failed.emit(str(exc), exc.key)
                 self._stop.wait(self.ERROR_PAUSE)
@@ -166,7 +178,13 @@ class AnalysisThread(QThread):
             log.warning("Coup non confirmé — attendu %s, lu %s",
                         expected, reading.placement)
             self.failed.emit("", "err_autoplay")
-            self._analyzer.reset()
+            # `resync`, pas `reset` : on garde la certitude que ce n'est
+            # plus notre tour. Un reset() traitait la position actuelle
+            # (juste après NOTRE coup) comme un premier tour et retentait
+            # aussitôt de jouer, avant même que l'adversaire ait répondu —
+            # exactement le symptôme "elle essaie de jouer alors que ce
+            # n'est pas son tour" remonté par l'utilisateur.
+            self._analyzer.resync(reading.placement)
 
 
 # ───────────────────────────────────────────────────────────────────
@@ -184,9 +202,13 @@ class ChessHelper(QWidget):
 
         self.is_dark = bool(config.get("theme_dark", True))
         self.lang = config.get("language") or i18n.detect_system_lang()
-        self.analyzer = Analyzer()
+        # pas de détection automatique par contours dans l'interface : c'est
+        # toujours l'utilisateur qui entoure l'échiquier à la souris (et donc
+        # qui indique du même coup sur quel écran il se trouve).
+        self.analyzer = Analyzer(BoardLocator(auto_detect=False))
         self.thread: AnalysisThread | None = None
         self.overlay = BoardOverlay()
+        self._manual_overlay: ManualCalibrationOverlay | None = None
 
         self.sun_icon = self._icon("sun.png")
         self.moon_icon = self._icon("moon.png")
@@ -237,6 +259,17 @@ class ChessHelper(QWidget):
         self.mode_box.addItem("", "auto")
         self.mode_box.addItem("", "manual")
         self.mode_box.setFixedWidth(180)
+
+        self.llm_chk = QCheckBox()
+        self.llm_chk.setChecked(bool(config.get("llm_enabled", True)))
+
+        # Orientation réelle du plateau à l'écran : par défaut on la déduit
+        # de la couleur jouée (convention la plus courante), mais certains
+        # sites n'inversent pas l'affichage même en jouant les Noirs — dans
+        # ce cas, décocher évite de lire (et jouer !) un plateau en miroir.
+        self.flip_chk = QCheckBox()
+        self.flip_chk.setChecked(False)
+        self._flip_auto = True          # tant que l'utilisateur n'a pas décidé lui-même
 
         self.lang_box = QComboBox()
         codes = i18n.available_codes()
@@ -342,6 +375,8 @@ class ChessHelper(QWidget):
         head.addWidget(self.black_rb)
         head.addStretch()
         head.addWidget(self.mode_box)
+        head.addWidget(self.flip_chk)
+        head.addWidget(self.llm_chk)
         head.addWidget(self.lang_box)
         head.addWidget(self.calib_btn)
         head.addWidget(self.theme_btn)
@@ -365,6 +400,10 @@ class ChessHelper(QWidget):
         self.theme_btn.clicked.connect(self.toggle_theme)
         self.calib_btn.clicked.connect(self.calibrate)
         self.lang_box.currentIndexChanged.connect(self.on_lang_change)
+        self.llm_chk.toggled.connect(self.on_llm_toggle)
+        self.flip_chk.toggled.connect(self.on_flip_toggle)
+        self.white_rb.toggled.connect(self._sync_flip_default)
+        self.black_rb.toggled.connect(self._sync_flip_default)
 
         # Les raccourcis passent par QShortcut : ils fonctionnent même quand
         # le focus est sur un QComboBox ou le QTextEdit.
@@ -386,8 +425,24 @@ class ChessHelper(QWidget):
         self.lang = self.lang_box.itemData(index)
         config.set("language", self.lang)
         if self.thread is not None:
-            self.thread.configure(self._side(), self.lang)
+            self.thread.configure(self._side(), self.lang, self.flip_chk.isChecked())
         self.apply_language()
+
+    def on_llm_toggle(self, checked: bool) -> None:
+        config.set("llm_enabled", checked)
+
+    def on_flip_toggle(self, _checked: bool) -> None:
+        # dès que l'utilisateur touche la case lui-même, on arrête de la
+        # réécrire automatiquement quand il change de couleur.
+        self._flip_auto = False
+
+    def _sync_flip_default(self) -> None:
+        """Suggestion par défaut : Noirs → plateau retourné (convention la
+        plus courante). Ne s'applique que tant que l'utilisateur n'a pas
+        lui-même corrigé la case, pour les sites qui ne retournent pas
+        l'affichage."""
+        if self._flip_auto:
+            self.flip_chk.setChecked(self.black_rb.isChecked())
 
     def apply_language(self) -> None:
         self.setLayoutDirection(
@@ -406,6 +461,10 @@ class ChessHelper(QWidget):
         self.wait_lbl.setText(self.T("waiting"))
         self.mode_box.setItemText(0, self.T("mode_auto"))
         self.mode_box.setItemText(1, self.T("mode_manual"))
+        self.llm_chk.setText(self.T("llm_toggle"))
+        self.llm_chk.setToolTip(self.T("llm_toggle_hint"))
+        self.flip_chk.setText(self.T("flip_board"))
+        self.flip_chk.setToolTip(self.T("flip_board_hint"))
 
         self.sc_title.setText(self.T("shortcuts"))
         for key, lbl in self.sc_labels.items():
@@ -533,7 +592,7 @@ class ChessHelper(QWidget):
         self.stop_btn.setEnabled(True)
 
         self.thread = AnalysisThread(self.analyzer, self)
-        self.thread.configure(self._side(), self.lang)
+        self.thread.configure(self._side(), self.lang, self.flip_chk.isChecked())
         self.thread.resultReady.connect(self.on_result)
         self.thread.failed.connect(self.on_failed)
         self.thread.statusChanged.connect(self.on_status_key)
@@ -560,19 +619,41 @@ class ChessHelper(QWidget):
 
     # ── calibration ─────────────────────────────────────────────────
     def calibrate(self) -> None:
+        """
+        Aucune détection automatique par contours dans l'interface : trop
+        peu fiable (thèmes à faible contraste, autres damiers à l'écran,
+        fenêtre ChessMate qui recouvre le plateau...). C'est toujours
+        l'utilisateur qui entoure l'échiquier à la souris — ce qui indique
+        du même coup sur quel écran il se trouve.
+        """
         was_running = self._running()
         self.stop()
-        self.set_status(self.T("calibrating"))
-        QApplication.processEvents()
+        self.set_status(self.T("calibrate_manual_hint"))
+        overlay = ManualCalibrationOverlay(self.T("calibrate_manual_hint"))
+        self._manual_overlay = overlay          # référence forte : sinon Qt la détruit
+
+        overlay.selected.connect(
+            lambda rect: self._on_manual_calibrated(rect, was_running))
+        overlay.cancelled.connect(self._on_manual_calibration_cancelled)
+        overlay.show()
+
+    def _on_manual_calibrated(self, rect, was_running: bool) -> None:
+        self._manual_overlay = None
         try:
-            geom = self.analyzer.recalibrate()
+            monitor, left, top, size = rect_to_geometry(rect)
+            geom = self.analyzer.locator.set_manual(left, top, size, monitor=monitor)
         except Exception as exc:                                # noqa: BLE001
             self.set_status(self.T("err_vision", detail=str(exc)), error=True)
             return
+        self.analyzer.reset()
         self.set_status(self.T("calibrated", size=geom.size,
                                left=geom.left, top=geom.top))
         if was_running:
             self.start()
+
+    def _on_manual_calibration_cancelled(self) -> None:
+        self._manual_overlay = None
+        self.set_status(self.T("calibrate_manual_cancelled"), error=True)
 
     # ── réception des résultats ─────────────────────────────────────
     def on_status_key(self, key: str) -> None:
@@ -595,11 +676,46 @@ class ChessHelper(QWidget):
         """
         Exécuté dans le thread graphique.  Le thread d'analyse est en pause
         jusqu'à `acknowledge()`, donc aucune course n'est possible ici.
+
+        En mode automatique, le coup n'est pas joué tout de suite : un clic
+        instantané dès que le moteur a fini de réfléchir n'a rien d'humain
+        et se repère facilement. On affiche le coup trouvé immédiatement
+        (transparence pour l'utilisateur), mais on ne clique/glisse
+        réellement qu'après un délai aléatoire — `QTimer.singleShot` plutôt
+        qu'un `time.sleep`, pour ne pas geler l'interface pendant l'attente.
         """
+        self._render(analysis)
+
+        if self._mode() == "auto":
+            delay = random.uniform(
+                float(config.get("autoplay_delay_min", 6.0)),
+                float(config.get("autoplay_delay_max", 15.0)),
+            )
+            self.set_status(self.T("status_delay"), transient=True)
+            thread = self.thread
+            QTimer.singleShot(int(delay * 1000),
+                              lambda: self._execute_result(analysis, thread))
+        else:
+            self._execute_result(analysis, self.thread)
+
+    def _execute_result(self, analysis: Analysis,
+                        thread: AnalysisThread | None) -> None:
+        """
+        Joue (ou surligne) le coup puis débloque le thread d'analyse.
+        Séparé de `on_result` pour pouvoir être différé par le délai
+        aléatoire ci-dessus sans bloquer l'interface entre-temps.
+
+        `thread` est celui qui attendait CE résultat précisément : si
+        l'utilisateur a arrêté (ou recalibré, ce qui redémarre un nouveau
+        thread) pendant l'attente, `thread` n'est plus `self.thread` — le
+        coup n'a alors plus lieu d'être et on l'abandonne silencieusement,
+        plutôt que de cliquer sur un plateau qu'on ne surveille plus.
+        """
+        if thread is None or thread is not self.thread or not thread.isRunning():
+            return
+
         played = False
         try:
-            self._render(analysis)
-
             if self._mode() == "auto":
                 self.set_status(self.T("status_playing"), transient=True)
                 QApplication.processEvents()
@@ -618,12 +734,11 @@ class ChessHelper(QWidget):
             self.set_status(self.T("err_generic", detail=str(exc)), error=True)
             self.analyzer.commit_placement(analysis.placement)
         finally:
-            if self.thread is not None:
-                board = analysis.board_after if played else analysis.board_before
-                self.thread.acknowledge(
-                    expected_placement=board.board_fen() if played else None,
-                    side_after="w" if board.turn else "b",
-                )
+            board = analysis.board_after if played else analysis.board_before
+            thread.acknowledge(
+                expected_placement=board.board_fen() if played else None,
+                side_after="w" if board.turn else "b",
+            )
 
     def _render(self, a: Analysis) -> None:
         self.load_frame.hide()
@@ -654,7 +769,12 @@ class ChessHelper(QWidget):
 
         if a.llm_error:
             self.set_status(self.T("err_llm", detail=a.llm_error), transient=True)
-        elif not self.status_lbl.property("sticky"):
+        else:
+            # un résultat exploitable veut dire que la lecture a réussi :
+            # ça efface toute erreur "sticky" laissée par un échec transitoire
+            # précédent (case incertaine, plateau non trouvé un instant...),
+            # sans quoi le bandeau rouge restait affiché indéfiniment même
+            # une fois l'analyse repartie normalement.
             self.set_status("")
 
         self._fade_in(self.card)

@@ -10,6 +10,10 @@
   "error": "Erreur",
   "mode_auto": "Jeu automatique",
   "mode_manual": "Surlignage uniquement",
+  "llm_toggle": "🧠 IA (explications)",
+  "llm_toggle_hint": "Active ou désactive le commentaire du coup par l'IA locale. Désactivé : le meilleur coup est quand même joué, juste sans explication.",
+  "flip_board": "⇅ Plateau retourné",
+  "flip_board_hint": "À cocher si l'échiquier affiché à l'écran est physiquement retourné (Noirs en bas). Certains sites ne retournent pas l'affichage même quand vous jouez les Noirs : décochez dans ce cas.",
 
   "app_title": "ChessMate · votre ami IA à chaque coup",
   "shortcuts": "Raccourcis",
@@ -21,11 +25,13 @@
   "sc_calibrate": "Recalibrer le plateau",
 
   "calibrate": "🎯 Calibrer",
-  "calibrating": "Recherche du plateau…",
   "calibrated": "Plateau trouvé : {size} px en ({left}, {top})",
+  "calibrate_manual_hint": "Détection automatique impossible : entourez l'échiquier à la souris (clic droit ou Échap pour annuler)",
+  "calibrate_manual_cancelled": "Calibration manuelle annulée.",
 
   "status_watching": "Surveillance du plateau…",
   "status_thinking": "Réflexion…",
+  "status_delay": "Coup trouvé — je le joue dans un instant…",
   "status_playing": "Exécution du coup…",
 
   "checkmate": "Échec et mat !",
@@ -42,7 +48,7 @@
   "err_autoplay": "Coup non confirmé à l'écran — resynchronisation",
 
   "llm_system": "Tu es un grand-maître d'échecs.",
-  "llm_rule": "Choisis exactement un coup de la liste ci-dessous ; n'invente jamais un autre coup.",
+  "llm_rule": "Explique uniquement le coup indiqué ; ne propose jamais un autre coup.",
   "llm_explain_hint": "2 à 3 phrases en français",
   "llm_side_white": "Blancs",
   "llm_side_black": "Noirs"

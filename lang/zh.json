@@ -10,6 +10,10 @@
   "error": "错误",
   "mode_auto": "自动下棋",
   "mode_manual": "仅高亮",
+  "llm_toggle": "🧠 AI 讲解",
+  "llm_toggle_hint": "开启或关闭本地 AI 的讲解。关闭时依然会走选定的这一步，只是没有文字说明。",
+  "flip_board": "⇅ 棋盘已翻转",
+  "flip_board_hint": "如果屏幕上显示的棋盘实际是翻转的（黑方在下方），请勾选此项。有些网站即使你执黑也不会翻转显示，此时请取消勾选。",
 
   "app_title": "ChessMate · 每一步都有 AI 伙伴",
   "shortcuts": "快捷键",
@@ -21,11 +25,13 @@
   "sc_calibrate": "重新校准棋盘",
 
   "calibrate": "🎯 校准",
-  "calibrating": "正在查找棋盘…",
   "calibrated": "已找到棋盘：{size} 像素，位于 ({left}, {top})",
+  "calibrate_manual_hint": "自动检测失败：请用鼠标框选棋盘（右键或 Esc 取消）",
+  "calibrate_manual_cancelled": "已取消手动校准。",
 
   "status_watching": "正在监视棋盘…",
   "status_thinking": "思考中…",
+  "status_delay": "已找到走法 — 稍后就走…",
   "status_playing": "正在走子…",
 
   "checkmate": "将死！",
@@ -42,7 +48,7 @@
   "err_autoplay": "屏幕上未确认该走法 — 正在重新同步",
 
   "llm_system": "你是一位国际象棋特级大师。",
-  "llm_rule": "请从下面的列表中恰好选择一个走法；绝不要自行发明走法。",
+  "llm_rule": "只需解释给定的这一步走法；绝不要建议其他走法。",
   "llm_explain_hint": "用中文写 2 到 3 句话",
   "llm_side_white": "白方",
   "llm_side_black": "黑方"
