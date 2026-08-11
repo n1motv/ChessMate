@@ -1,2 +1,9 @@
 __pycache__/
 *.pyc
+
+# Réglages locaux : « monitor » et « boards » décrivent la disposition
+# d'écrans de LA machine courante. Versionné, ce fichier suivait le dépôt
+# d'un ordinateur à l'autre et y imposait un écran ou un rectangle de
+# plateau inexistants. Il est recréé au premier lancement à partir des
+# valeurs par défaut de config.py ; config.example.json en donne un aperçu.
+config.json

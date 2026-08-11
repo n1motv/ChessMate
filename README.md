@@ -116,19 +116,25 @@ Si le FEN affiché est faux, deux causes possibles :
 
 ## ⚙️ Configuration (`config.json`)
 
-Créé automatiquement au premier lancement. Clés principales :
+Créé automatiquement au premier lancement, et **non versionné** : les clés
+`monitor` et `boards` décrivent la disposition d'écrans de la machine
+courante. Suivre le dépôt d'un ordinateur à l'autre lui faisait imposer un
+écran ou un rectangle de plateau inexistants. [`config.example.json`](config.example.json)
+en donne un aperçu ; copiez-le si vous voulez partir d'un fichier explicite,
+sinon laissez ChessMate le créer.
 
 | Clé | Défaut | Rôle |
 |-----|--------|------|
-| `engine_profile` | `"blitz"` | `bullet` / `blitz` / `rapid` / `analysis` |
+| `engine_profile` | `"rapid"` | `bullet` / `blitz` / `rapid` / `analysis` |
 | `engine_threads` | `null` | `null` → tous les cœurs |
 | `engine_hash_mb` | `null` | `null` → valeur du profil |
-| `min_square_confidence` | `0.80` | en dessous, la case est jugée douteuse |
-| `max_uncertain_squares` | `0` | nb de cases douteuses tolérées avant abandon |
+| `min_square_confidence` | `0.75` | en dessous, la case est jugée douteuse |
+| `max_uncertain_squares` | `3` | nb de cases douteuses tolérées avant abandon |
 | `llm_enabled` | `true` | `false` → analyse moteur seule |
 | `llm_timeout` | `12.0` | secondes |
 | `autoplay_style` | `"click"` | `"click"` ou `"drag"` selon le site |
 | `autoplay_verify` | `true` | recapture l'écran pour confirmer le coup |
+| `autoplay_delay_min` / `_max` | `3.0` / `7.0` | délai aléatoire (s) avant de jouer le coup |
 | `dump_squares` | `false` | débogage : écrit les 64 imagettes à chaque capture |
 
 ### Variables d'environnement

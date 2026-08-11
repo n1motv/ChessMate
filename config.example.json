@@ -1,24 +1,13 @@
 {
-  "monitor": 2,
-  "boards": {
-    "1920x1080": {
-      "left": -1563,
-      "top": 301,
-      "size": 851
-    },
-    "1920x1200": {
-      "left": 128,
-      "top": 340,
-      "size": 685
-    }
-  },
+  "monitor": 1,
+  "boards": {},
   "min_square_confidence": 0.75,
   "max_uncertain_squares": 3,
   "dump_squares": false,
   "engine_profile": "rapid",
   "engine_threads": null,
   "engine_hash_mb": null,
-  "llm_enabled": false,
+  "llm_enabled": true,
   "llm_timeout": 12.0,
   "llm_retries": 1,
   "humanize_moves": true,
@@ -35,5 +24,5 @@
     "b"
   ],
   "theme_dark": true,
-  "language": "fr"
+  "language": null
 }

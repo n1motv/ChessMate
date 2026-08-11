@@ -68,6 +68,28 @@ def test_assets_referenced_by_the_ui_exist():
             assert (FLAGS_DIR / flag).exists(), f"assets/flags/{flag} manquant"
 
 
+def test_config_example_matches_the_real_defaults():
+    """
+    `config.example.json` est la seule trace versionnee des reglages depuis
+    que `config.json` est ignore : il doit rester aligne sur `config.py`,
+    sinon il documente des valeurs que le programme n'utilise plus.
+    """
+    import config
+
+    example = json.loads(
+        (ROOT / "config.example.json").read_text(encoding="utf-8"))
+    assert example == config.DEFAULTS, (
+        "config.example.json a divergé de config.DEFAULTS : "
+        f"{sorted(set(example.items()) ^ set(config.DEFAULTS.items()))}"
+    )
+
+
+def test_local_config_is_not_tracked_by_git():
+    """`config.json` porte l'écran et le rectangle propres à chaque machine."""
+    ignore = (ROOT / ".gitignore").read_text(encoding="utf-8").split()
+    assert "config.json" in ignore, "config.json doit rester hors du dépôt"
+
+
 def test_ui_labels_are_translated_in_every_language():
     """Les intitulés introduits par la refonte doivent exister partout."""
     keys = ["app_tagline", "white_short", "black_short", "sec_color",

@@ -4,6 +4,12 @@ config.py – réglages persistants (config.json à la racine du projet).
 Sert notamment à mémoriser la calibration du plateau **par résolution
 d'écran**, ce qui supprime le besoin d'éditer `vision.py` à la main (l'ancien
 LEFT / TOP / SIZE documenté dans le README).
+
+`config.json` n'est pas versionné (voir `.gitignore`) : `monitor` et `boards`
+décrivent la disposition d'écrans de la machine courante, et le fichier
+imposait un écran ou un rectangle inexistants dès qu'il suivait le dépôt
+ailleurs. Il est recréé ici à partir de `DEFAULTS` ; `config.example.json`
+en donne un aperçu à jour.
 """
 from __future__ import annotations
 
