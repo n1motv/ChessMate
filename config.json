@@ -7,9 +7,9 @@
       "size": 851
     },
     "1920x1200": {
-      "left": 64,
+      "left": 128,
       "top": 340,
-      "size": 684
+      "size": 685
     }
   },
   "min_square_confidence": 0.75,
